@@ -1,12 +1,15 @@
 # lw-telegram-bot
 Lightweight NodeJS Telegram bot framework
 
-## Exports: bot, Telegram <br>
+## Exports: bot, Telegram, app <br>
 1. *bot* methods <br>
 *init, start, command, text, message, callbackQueryData*. <br>
 
 2. *Telegram* methods<br>
 *sendMessage, sendSticker, sendPhoto, sendVideo, sendVoice, sendVideoNote, sendAudio, sendAnimation, sendDocument, answerCallbackQuery*.<br>
+
+3. *app*<br>
+*app* is referenced to *express*
 
 ## Working with Context (ctx)
 1. *ctx*: update <br>
