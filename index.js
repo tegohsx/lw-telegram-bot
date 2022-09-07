@@ -195,6 +195,24 @@ Telegram.sendDocument = (chat_id, document, option = {}) => {
 
 }
 
+Telegram.answerCallbackQuery = (callback_query_id, option = {}) => {
+    Post = {
+        callback_query_id,
+        ...option
+    }
+
+    return new Promise((resolve, reject) => {
+        sendAll('answerCallbackQuery', Post, (err, res) => {
+            if (err == null) {
+                resolve(res)
+            } else {
+                reject(err)
+            }
+        })
+    })
+
+}
+
 
 bot.init = (option, callback) => {
     TOKEN = option.token || ''
