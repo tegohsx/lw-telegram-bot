@@ -17,10 +17,9 @@ let TOKEN = '',
     Context = {},
     Post = {},
     NextUpdate = 0,
-    setPromise,
-    bot = {},
     Updates = {},
-    UpdatesData = {}
+    UpdatesData = {},
+    bot = {}
 
 
 bot.route = {}
@@ -32,7 +31,7 @@ Telegram.sendMessage = (chat_id, text, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendMessage', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -42,7 +41,6 @@ Telegram.sendMessage = (chat_id, text, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendSticker = (chat_id, sticker, option = {}) => {
@@ -52,7 +50,7 @@ Telegram.sendSticker = (chat_id, sticker, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendSticker', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -62,7 +60,6 @@ Telegram.sendSticker = (chat_id, sticker, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendPhoto = (chat_id, photo, option = {}) => {
@@ -72,7 +69,7 @@ Telegram.sendPhoto = (chat_id, photo, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendPhoto', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -82,7 +79,6 @@ Telegram.sendPhoto = (chat_id, photo, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendVideo = (chat_id, video, option = {}) => {
@@ -92,7 +88,7 @@ Telegram.sendVideo = (chat_id, video, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendVideo', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -102,7 +98,6 @@ Telegram.sendVideo = (chat_id, video, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendVoice = (chat_id, voice, option = {}) => {
@@ -112,7 +107,7 @@ Telegram.sendVoice = (chat_id, voice, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendVoice', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -122,7 +117,6 @@ Telegram.sendVoice = (chat_id, voice, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendVideoNote = (chat_id, video_note, option = {}) => {
@@ -132,7 +126,7 @@ Telegram.sendVideoNote = (chat_id, video_note, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendVideoNote', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -142,7 +136,6 @@ Telegram.sendVideoNote = (chat_id, video_note, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendAudio = (chat_id, audio, option = {}) => {
@@ -152,7 +145,7 @@ Telegram.sendAudio = (chat_id, audio, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendAudio', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -162,7 +155,6 @@ Telegram.sendAudio = (chat_id, audio, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendAnimation = (chat_id, animation, option = {}) => {
@@ -172,7 +164,7 @@ Telegram.sendAnimation = (chat_id, animation, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendAnimation', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -182,7 +174,6 @@ Telegram.sendAnimation = (chat_id, animation, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 Telegram.sendDocument = (chat_id, document, option = {}) => {
@@ -192,7 +183,7 @@ Telegram.sendDocument = (chat_id, document, option = {}) => {
         ...option
     }
 
-    setPromise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         sendAll('sendDocument', Post, (err, res) => {
             if (err == null) {
                 resolve(res)
@@ -202,7 +193,6 @@ Telegram.sendDocument = (chat_id, document, option = {}) => {
         })
     })
 
-    return setPromise
 }
 
 
