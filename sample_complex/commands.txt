@@ -1,0 +1,11 @@
+/start
+/cubevolume [a]
+/cubesurfacearea [a]
+
+example:
+/cubevolume 20
+/cubesurfacearea 20
+
+result:
+80
+120
