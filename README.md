@@ -1,6 +1,11 @@
 # lw-telegram-bot
 Lightweight NodeJS Telegram bot framework
 
+## Dependencies
+1. express
+2. body-parser
+2. axios
+
 ## Exports: bot, Telegram, app <br>
 1. *bot* methods <br>
 *init, start, command, text, message, callbackQueryData*. <br>
