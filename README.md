@@ -1,5 +1,5 @@
 # lw-telegram-bot
-Lightweight NodeJS Telegram bot framework
+Lightweight NodeJS Telegram bot library
 
 ## Dependencies
 1. express
