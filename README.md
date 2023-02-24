@@ -3,15 +3,14 @@ Lightweight NodeJS Telegram bot library
 
 ## Dependencies
 1. express
-2. body-parser
-2. axios
+2. queue
 
 ## Exports: bot, Telegram, app <br>
 1. *bot* methods <br>
-*init, start, command, text, message, callbackQueryData*. <br>
+*init, start, command, text, message, kicked, callbackQueryData*. <br>
 
 2. *Telegram* methods<br>
-*sendMessage, sendSticker, sendPhoto, sendVideo, sendVoice, sendVideoNote, sendAudio, sendAnimation, sendDocument, answerCallbackQuery*.<br>
+*sendMessage, sendSticker, sendPhoto, sendVideo, sendVoice, sendVideoNote, sendAudio, sendAnimation, sendDocument, deleteMessage, sendRaw, answerCallbackQuery*.<br>
 
 3. *app*<br>
 *app* is referenced to *express*
