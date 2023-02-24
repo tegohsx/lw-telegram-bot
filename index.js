@@ -1,31 +1,88 @@
 const express = require('express')
-const bodyParser = require("body-parser")
-const axios = require('axios')
-
+const queue = require('queue')
 const app = express()
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+
+const job = queue({ results: [] })
 
 "use strict"
 
 let TOKEN = '',
     SECRET = '',
     Rate = 0,
-    Selected = 0,
-    Update = {},
+
     Telegram = {},
-    Context = {},
-    Post = {},
     NextUpdate = 0,
-    Updates = {},
-    UpdatesData = {},
+    botListen = [],
     bot = {}
 
 
 bot.route = {}
 
-Telegram.sendMessage = (chat_id, text, option = {}) => {
-    Post = {
+//customize listen
+bot.start = (callback) => {
+    botListen.push((Context) => {
+        if (Context.message.text.startsWith('/start')) {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+bot.command = (cmd, callback) => {
+    botListen.push((Context) => {
+        if (Context.message.text.startsWith('/' + cmd)) {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+bot.text = (text, callback) => {
+    botListen.push((Context) => {
+        if (Context.message.text.match(text)) {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+
+bot.message = (callback) => {
+    botListen.push((Context) => {
+        if (Context.message) {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+bot.callbackQueryData = (data, callback) => {
+    botListen.push((Context) => {
+        if (Context.callback_query.data.match(data)) {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+bot.kicked = (callback) => {
+    botListen.push((Context) => {
+        if (Context?.my_chat_member?.new_chat_member.status == 'kicked') {
+            callback(Context)
+            return true
+        }
+        return false
+    })
+}
+
+//telegram object
+Telegram.sendMessage = async (chat_id, text, option = {}) => {
+    let Post = {
         chat_id,
         text,
         ...option
@@ -43,8 +100,8 @@ Telegram.sendMessage = (chat_id, text, option = {}) => {
 
 }
 
-Telegram.sendSticker = (chat_id, sticker, option = {}) => {
-    Post = {
+Telegram.sendSticker = async (chat_id, sticker, option = {}) => {
+    let Post = {
         chat_id,
         sticker,
         ...option
@@ -62,8 +119,8 @@ Telegram.sendSticker = (chat_id, sticker, option = {}) => {
 
 }
 
-Telegram.sendPhoto = (chat_id, photo, option = {}) => {
-    Post = {
+Telegram.sendPhoto = async (chat_id, photo, option = {}) => {
+    let Post = {
         chat_id,
         photo,
         ...option
@@ -81,8 +138,8 @@ Telegram.sendPhoto = (chat_id, photo, option = {}) => {
 
 }
 
-Telegram.sendVideo = (chat_id, video, option = {}) => {
-    Post = {
+Telegram.sendVideo = async (chat_id, video, option = {}) => {
+    let Post = {
         chat_id,
         video,
         ...option
@@ -100,8 +157,8 @@ Telegram.sendVideo = (chat_id, video, option = {}) => {
 
 }
 
-Telegram.sendVoice = (chat_id, voice, option = {}) => {
-    Post = {
+Telegram.sendVoice = async (chat_id, voice, option = {}) => {
+    let Post = {
         chat_id,
         voice,
         ...option
@@ -119,8 +176,8 @@ Telegram.sendVoice = (chat_id, voice, option = {}) => {
 
 }
 
-Telegram.sendVideoNote = (chat_id, video_note, option = {}) => {
-    Post = {
+Telegram.sendVideoNote = async (chat_id, video_note, option = {}) => {
+    let Post = {
         chat_id,
         video_note,
         ...option
@@ -138,8 +195,8 @@ Telegram.sendVideoNote = (chat_id, video_note, option = {}) => {
 
 }
 
-Telegram.sendAudio = (chat_id, audio, option = {}) => {
-    Post = {
+Telegram.sendAudio = async (chat_id, audio, option = {}) => {
+    let Post = {
         chat_id,
         audio,
         ...option
@@ -157,8 +214,8 @@ Telegram.sendAudio = (chat_id, audio, option = {}) => {
 
 }
 
-Telegram.sendAnimation = (chat_id, animation, option = {}) => {
-    Post = {
+Telegram.sendAnimation = async (chat_id, animation, option = {}) => {
+    let Post = {
         chat_id,
         animation,
         ...option
@@ -176,8 +233,8 @@ Telegram.sendAnimation = (chat_id, animation, option = {}) => {
 
 }
 
-Telegram.sendDocument = (chat_id, document, option = {}) => {
-    Post = {
+Telegram.sendDocument = async (chat_id, document, option = {}) => {
+    let Post = {
         chat_id,
         document,
         ...option
@@ -195,8 +252,26 @@ Telegram.sendDocument = (chat_id, document, option = {}) => {
 
 }
 
-Telegram.answerCallbackQuery = (callback_query_id, option = {}) => {
-    Post = {
+Telegram.deleteMessage = async (chat_id, message_id) => {
+    let Post = {
+        chat_id,
+        message_id
+    }
+
+    return new Promise((resolve, reject) => {
+        sendAll('deleteMessage', Post, (err, res) => {
+            if (err == null) {
+                resolve(res)
+            } else {
+                reject(err)
+            }
+        })
+    })
+
+}
+
+Telegram.answerCallbackQuery = async (callback_query_id, option = {}) => {
+    let Post = {
         callback_query_id,
         ...option
     }
@@ -214,7 +289,24 @@ Telegram.answerCallbackQuery = (callback_query_id, option = {}) => {
 }
 
 
-bot.init = (option, callback) => {
+Telegram.sendRaw = async (command, option = {}) => {
+    let Post = {
+        ...option
+    }
+
+    return new Promise((resolve, reject) => {
+        sendAll(command, Post, (err, res) => {
+            if (err == null) {
+                resolve(res)
+            } else {
+                reject(err)
+            }
+        })
+    })
+
+}
+
+bot.init = async (option, callback) => {
     TOKEN = option.token || ''
     SECRET = option.secret_path || ''
 
@@ -231,19 +323,19 @@ bot.init = (option, callback) => {
         });
     } else {
         console.log('App is running.')
-        getUpdates('',(err, result) => {
+        getUpdates('', (err, result) => {
             if (err == null) {
-                UpdatesData = result.data
+                let UpdatesData = result
                 if (UpdatesData.ok) {
-                    Updates = UpdatesData.result
-                    if(Updates.length == 1){
-                        NextUpdate = Updates[0].update_id+1
+                    let Updates = UpdatesData.result
+                    if (Updates.length == 1) {
+                        NextUpdate = Updates[0].update_id + 1
                         run_bot(Updates[0], callback)
                     } else {
-                        Updates.forEach((update)=>{
-                            NextUpdate = update.update_id+1
+                        Updates.forEach((update) => {
+                            NextUpdate = update.update_id + 1
                             run_bot(update, callback)
-                        })   
+                        })
                     }
                 }
             }
@@ -251,163 +343,160 @@ bot.init = (option, callback) => {
     }
 }
 
-bot.start = (callback) => {
-    if (Update.message.text.startsWith('/start') && Selected == 0) {
-        callback(Context)
-        Selected = 1
-    }
-}
-
-bot.command = (cmd, callback) => {
-    if (Update.message.text.startsWith('/' + cmd) && Selected == 0) {
-        callback(Context)
-        Selected = 1
-    }
-}
-
-bot.text = (text, callback) => {
-    if (Update.message.text.match(text) && Selected == 0) {
-        callback(Context)
-        Selected = 1
-    }
-}
-
-
-bot.message = (callback) => {
-    if (Update.message && Selected == 0) {
-        callback(Context)
-        Selected = 1
-    }
-}
-
-bot.callbackQueryData = (data, callback) => {
-    if (Update.callback_query.data.match(data) && Selected == 0) {
-        callback(Context)
-        Selected = 1
-    }
-}
-
-bot.route.get = (path, callback) => app.get('/' + SECRET + path, callback)
-bot.route.put = (path, callback) => app.put('/' + SECRET + path, callback)
-bot.route.patch = (path, callback) => app.patch('/' + SECRET + path, callback)
-bot.route.delete = (path, callback) => app.delete('/' + SECRET + path, callback)
-bot.route.post = (path, callback) => app.post('/' + SECRET + path, callback)
-bot.route.head = (path, callback) => app.head('/' + SECRET + path, callback)
+bot.route.get = async (path, callback) => app.get('/' + SECRET + path, callback)
+bot.route.put = async (path, callback) => app.put('/' + SECRET + path, callback)
+bot.route.patch = async (path, callback) => app.patch('/' + SECRET + path, callback)
+bot.route.delete = async (path, callback) => app.delete('/' + SECRET + path, callback)
+bot.route.post = async (path, callback) => app.post('/' + SECRET + path, callback)
+bot.route.head = async (path, callback) => app.head('/' + SECRET + path, callback)
 
 bot = {
     ...bot,
     ...Telegram
 }
 
-const run_bot = (req, callback) => {
-    Selected = 0;
-    Update = req
+const run_bot = async (req) => {
+    let Update = req
     Update.message = Update.message || {}
     Update.message.text = Update.message.text || ''
     Update.message.chat = Update.message.chat || {}
     Update.callback_query = Update.callback_query || {}
     Update.callback_query.data = Update.callback_query.data || ''
 
-    Context = Update
+    let Context = Update
     Context.telegram = Telegram
-    Context.chat_id = Update.callback_query?.message?.chat?.id || Update.message.chat.id
-    Context.chat = Update.callback_query?.message?.chat || Update.message.chat
 
-    Context.replyWithText = (text, options = {}) => {
+    if (Update?.my_chat_member) {
+        Context.chat_id = Update.my_chat_member.chat?.id
+        Context.chat = Update.my_chat_member.chat
+    } else {
+        Context.chat_id = Update.callback_query?.message?.chat?.id || Update.message.chat?.id
+        Context.chat = Update.callback_query?.message?.chat || Update.message.chat
+    }
+
+    Context.replyWithText = async (text, options = {}) => {
         return Telegram.sendMessage(Context.chat_id, text, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithSticker = (sticker, options = {}) => {
+    Context.replyWithSticker = async (sticker, options = {}) => {
         return Telegram.sendSticker(Context.chat_id, sticker, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithPhoto = (photo, options = {}) => {
+    Context.replyWithPhoto = async (photo, options = {}) => {
         return Telegram.sendPhoto(Context.chat_id, photo, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithVideo = (video, options = {}) => {
+    Context.replyWithVideo = async (video, options = {}) => {
         return Telegram.sendVideo(Context.chat_id, video, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithVoice = (voice, options = {}) => {
+    Context.replyWithVoice = async (voice, options = {}) => {
         return Telegram.sendVoice(Context.chat_id, voice, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithVideoNote = (video_note, options = {}) => {
+    Context.replyWithVideoNote = async (video_note, options = {}) => {
         return Telegram.sendVideoNote(Context.chat_id, video_note, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithAudio = (audio, options = {}) => {
+    Context.replyWithAudio = async (audio, options = {}) => {
         return Telegram.sendAudio(Context.chat_id, audio, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithAnimation = (animation, options = {}) => {
+    Context.replyWithAnimation = async (animation, options = {}) => {
         return Telegram.sendAnimation(Context.chat_id, animation, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    Context.replyWithDocument = (document, options = {}) => {
+    Context.replyWithDocument = async (document, options = {}) => {
         return Telegram.sendDocument(Context.chat_id, document, {
             ...options,
             reply_to_message_id: Context.message.message_id
         })
     }
 
-    callback()
+    for (let cb of botListen) {
+        if (cb(Context))
+            break
+    }
+
 }
 
-const sendAll = (perintah, data, callback) => {
-    Rate++
-    if (Rate < 25) {
-        axios.post('https://api.telegram.org/bot' + TOKEN + '/' + perintah, data).then(result => {
-            if (typeof (callback) === 'function')
-                callback(null, result)
-        }).catch(function (error) {
-            if (typeof (callback) === 'function')
-                callback(error)
+const sendAll = async (perintah, data, callback) => {
+    if (Rate < 30) {
+        job.push(async function () {
+
+            try {
+                Rate++
+                let response = await fetch('https://api.telegram.org/bot' + TOKEN + '/' + perintah, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                let resJson = await response.json()
+
+                if (typeof (callback) === 'function')
+                    if (response.status < 200 || response.status > 299) {
+                        callback({status: response.status, body: resJson})
+                    } else {
+                        callback(null, resJson)
+                    }
+            } catch (error){
+                if (typeof (callback) === 'function')
+                    callback(error)
+            }
         })
     } else {
-        setTimeout(() => sendAll(perintah, data, callback), 667)
+        setTimeout(() => sendAll(perintah, data, callback), 300)
     }
 }
 
-const getUpdates = (offset, callback) => {
-    axios.get('https://api.telegram.org/bot' + TOKEN + '/getUpdates?offset=' + offset).then(result => {
-        if (typeof (callback) === 'function')
-            callback(null, result)
-            setTimeout(() => getUpdates(NextUpdate,callback), 500)
-    }).catch(function (error) {
-        if (typeof (callback) === 'function')
-            callback(error)
-            setTimeout(() => getUpdates(NextUpdate,callback), 500)
-    })
-
+const getUpdates = async (offset, callback) => {
+    fetch('https://api.telegram.org/bot' + TOKEN + '/getUpdates?offset=' + offset)
+        .then((response) => response.json())
+        .then((data) => {
+            if (typeof (callback) === 'function')
+                callback(null, data)
+            setTimeout(() => getUpdates(NextUpdate, callback), 500)
+        })
+        .catch((error) => {
+            if (typeof (callback) === 'function')
+                callback(error)
+            setTimeout(() => getUpdates(NextUpdate, callback), 500)
+        });
 }
 
-setInterval(() => Rate = 0, 1000)
+job.timeout = 42;
+job.autostart = true;
+
+setInterval(() => {
+    Rate = 0;
+}, 1000)
 
 module.exports = {
     bot, Telegram, app
