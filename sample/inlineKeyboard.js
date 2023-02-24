@@ -28,9 +28,9 @@ bot.callbackQueryData('tapHalo', (ctx)=>{
 
 bot.callbackQueryData(/^tapHi/, (ctx)=>{
     ctx.telegram.sendMessage(ctx.chat_id, 'You were tap Hi').then((res)=>{
-        console.log(res) //return axios response
+        console.log(res) //return fetch response
     }).catch((err)=>{
-        console.log(err) //return axios error
+        console.log(err) //return fetch error
     })
 })
 
